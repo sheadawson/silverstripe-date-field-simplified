@@ -64,7 +64,7 @@ class SimpleDateField extends TextField {
 		}
 	);
 JS;
-			Requirements :: customScript($jsFunc, 'func_validateSimpleDate_'.$formID);		
+		Requirements :: customScript($jsFunc, 'func_validateSimpleDate_'.$formID);		
 		$html = parent::Field();
 		return $html;
 	}
