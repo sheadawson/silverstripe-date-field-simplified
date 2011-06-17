@@ -37,34 +37,45 @@ class SimpleDateField extends TextField {
 	function Field() {
 		$settings = addslashes(serialize(self::get_config()));
 		$formID = $this->form->FormName();
+		$fieldID = $this->id();
 		$url = SimpleDateField_Controller::get_url();
 		$this->addExtraClass("simpledatefield");
-			$jsFunc =<<<JS
-	jQuery('#$formID input.simpledatefield ').change(
+		$jsFuncField =<<<JS
+	jQuery('#$fieldID').change(
 		function() {
 			var id = jQuery(this).attr("id");
-			jQuery.ajax(
-				{
-					url: "\/$url\/ajaxvalidation\/",
-					data: ({value: escape(jQuery(this).val()),settings: '$settings'}),
-					success: function(returnData) {
-						array = returnData.split("|");
-						if(!array[1] || array[1] == "0") {
-							jQuery("#" + id).attr("value","?");
-							jQuery("label[for='"+id+"'].right").text(array[0]);
-						}
-						else {
-							jQuery("label[for='"+id+"'].right").text(" ");
-							jQuery("#" + id).attr("value",array[0]);
-						}
-						
-					}
-				}
-			);
+			var value_value = escape(jQuery(this).val());
+			url_value = "\/$url\/ajaxvalidation\/";
+			settings_value = escape('$settings');
+			getSimpleDateValue(id, value_value, url_value, settings_value);
 		}
 	);
 JS;
-		Requirements :: customScript($jsFunc, 'func_validateSimpleDate_'.$formID);		
+		$jsFuncGeneral =<<<JS
+function SimpleDateFieldAjaxValidation(id, value_value, url_value, settings_value) {
+	jQuery.ajax(
+		{
+			url: url_value,
+			data: ({value: value_value,settings: settings_value}),
+			success: function(returnData) {
+				array = returnData.split("|");
+				if(!array[1] || array[1] == "0") {
+					jQuery("#" + id).attr("value","?");
+					jQuery("label[for='"+id+"'].right").text(array[0]);
+				}
+				else {
+					jQuery("label[for='"+id+"'].right").text(" ");
+					jQuery("#" + id).attr("value",array[0]);
+				}
+				
+			}
+		}
+	);
+}
+JS;
+
+		Requirements :: customScript($jsFuncGeneral, 'func_SimpleDateField');		
+		Requirements :: customScript($jsFuncField, 'func_SimpleDateField'.$fieldID);		
 		$html = parent::Field();
 		return $html;
 	}
