@@ -1,6 +1,10 @@
 <?php
 
-
+/**
+ * @author nicolaas [at] sunnysideup.co.nz
+ * 
+ * 
+ */
 
 
 class SimpleDateField extends TextField {
@@ -24,17 +28,15 @@ class SimpleDateField extends TextField {
 		static function get_config_item($name) {return self::$config[$name];}
 		
 
-	function __construct($name, $title = null, $value = null, $form = null, $config = null) {
+	function __construct($name, $title = null, $value = null, $form = null, $config = array()) {
 		parent::__construct($name, $title, $value, $form);
-		if(!$this->getConfig("showcalendar")) {
-			if(!$rightTitle) {
-				$rightTitle = $this->getConfig("righttitle");
+		if($config && count($config)) {
+			foreach($config as $name => $value) {
+				self::$config[$name] = $value;
 			}
 		}
+		$rightTitle = $this->getConfig("righttitle");
 		$this->setRightTitle($rightTitle);
-		if($config) {
-			self::$config = $config;
-		}
 	}
 
 	function Field() {
@@ -47,10 +49,10 @@ class SimpleDateField extends TextField {
 	jQuery('#$fieldID').change(
 		function() {
 			var id = jQuery(this).attr("id");
-			var value_value = escape(jQuery(this).val());
+			var value_value = jQuery(this).val();
 			url_value = "\/$url\/ajaxvalidation\/";
-			settings_value = escape('$settings');
-			getSimpleDateValue(id, value_value, url_value, settings_value);
+			settings_value = '$settings';
+			SimpleDateFieldAjaxValidation(id, value_value, url_value, settings_value);
 		}
 	);
 JS;
@@ -137,9 +139,7 @@ JS;
 		return self::$config[$name];
 	}
 
-
 	static function convert_to_ts_or_error($rawInput) {
-		$tsOrError = null;
 		if(self::get_config_item('monthbeforeday')) {
 			$cleanedInput = str_replace("-", "/", $rawInput);
 		}
@@ -150,7 +150,7 @@ JS;
 		if($cleanedInput) {
 			$tsOrError = intval(strtotime($cleanedInput));
 		}
-		if(is_numeric($tsOrError)) {
+		if(is_numeric($tsOrError) && $tsOrError > 0) {
 			if($min = self::get_config_item('min')) {
 				$minDate = strtotime($min);
 				if($minDate > $tsOrError) {
@@ -178,10 +178,12 @@ JS;
 
 	static function convert_to_fancy_date($rawInput) {
 		$tsOrError = self::convert_to_ts_or_error($rawInput);
-		if(!is_numeric($tsOrError)) {
+		if(is_numeric($tsOrError) && $tsOrError) {
+			return date(self::get_config_item("dateformat"), $tsOrError )."|1";
+		}
+		else {
 			return "$tsOrError|0";
 		}
-		return date(self::get_config_item("dateformat"), $tsOrError )."|1";
 	}
 
 }
@@ -196,10 +198,10 @@ class SimpleDateField_Controller extends Controller {
 	function ajaxvalidation($request) {
 		$rawInput = '';
 		if(isset($_GET["value"])) {
-			$rawInput = $_GET["value"];
+			$rawInput = ($_GET["value"]);
 		}
 		if(isset($_GET["settings"])) {
-			SimpleDateField::set_config(unserialize($_GET["settings"]));
+			SimpleDateField::set_config(unserialize(($_GET["settings"])));
 		}		
 		return SimpleDateField::convert_to_fancy_date($rawInput);
 	}
