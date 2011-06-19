@@ -24,7 +24,7 @@ class SimpleDateField extends TextField {
 		static function get_config_item($name) {return self::$config[$name];}
 		
 
-	function __construct($name, $title = null, $value = null, $form = null, $rightTitle = null) {
+	function __construct($name, $title = null, $value = null, $form = null, $config = null) {
 		parent::__construct($name, $title, $value, $form);
 		if(!$this->getConfig("showcalendar")) {
 			if(!$rightTitle) {
@@ -32,6 +32,9 @@ class SimpleDateField extends TextField {
 			}
 		}
 		$this->setRightTitle($rightTitle);
+		if($config) {
+			self::$config = $config;
+		}
 	}
 
 	function Field() {
