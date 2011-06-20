@@ -54,8 +54,8 @@ class SimpleDateField extends TextField {
 		if($this->getConfig('showcalendar')) {
 			
 			Requirements::css(THIRDPARTY_DIR . '/jquery-ui-themes/smoothness/jquery.ui.all.css');
-			Requirements::javascript(SAPPHIRE_DIR . '/thirdparty/jquery-ui/jquery.ui.core.js');
-			Requirements::javascript(SAPPHIRE_DIR . '/thirdparty/jquery-ui/jquery.ui.datepicker.js');
+			Requirements::javascript(THIRDPARTY_DIR . '/jquery-ui/jquery.ui.core.js');
+			Requirements::javascript(THIRDPARTY_DIR . '/jquery-ui/jquery.ui.datepicker.js');
 			
 			// Include language files (if required)
 			$myLang = $this->getConfig("locale");
