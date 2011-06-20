@@ -29,7 +29,7 @@ class SimpleDateField extends TextField {
 		static function get_config_item($name) {return self::$config[$name];}
 		
 
-	function __construct($name, $title = null, $value = null, $form = null, $rightTitle = '', $config = array()) {
+	function __construct($name, $title = null, $value = null, $form = null, $config = array()) {
 		parent::__construct($name, $title, $value, $form);
 		if($config && count($config)) {
 			foreach($config as $name => $value) {
@@ -327,7 +327,7 @@ class SimpleDateField_Editable extends EditableFormField {
 		"ExplanationForEnteringDates" => "Varchar(120)"
 	);
 
-	static $singular_name = 'Simple ]Date Field';
+	static $singular_name = 'Simple Date Field';
 
 	static $plural_name = 'Simple Date Fields';
 
