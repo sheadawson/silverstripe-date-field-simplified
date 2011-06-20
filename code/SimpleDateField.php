@@ -2,8 +2,9 @@
 
 /**
  * @author nicolaas [at] sunnysideup.co.nz
- * 
- * 
+ * To Do:
+ * 1. write documenation
+ * 2. change $config into NON-static
  */
 
 
