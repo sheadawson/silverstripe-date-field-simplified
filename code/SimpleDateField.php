@@ -13,7 +13,7 @@ class SimpleDateField extends TextField {
 	/**
 	 * @var array
 	 */
-	protected static $config = array(
+	protected $config = array(
 		'showcalendar' => true,
 		'monthbeforeday' => false,
 		'righttitle' => "",
@@ -23,18 +23,14 @@ class SimpleDateField extends TextField {
 		'maxDate' => "", //you can enter "today" or "next week" or any strtotime argument!
 		'locale' => "" //alternative locale for JS Calendar
 	);
-		static function set_config($a) {self::$config = $a;}
-		static function add_config($key, $value) {self::$config[$key] = $value;}
-		//static function remove_config($key) {unset(self::$config[$key]);}
-		static function get_config() {return self::$config;}
-		static function get_config_item($name) {return self::$config[$name];}
+
 		
 
 	function __construct($name, $title = null, $value = null, $form = null, $config = array()) {
 		parent::__construct($name, $title, $value, $form);
 		if($config && count($config)) {
 			foreach($config as $name => $value) {
-				self::$config[$name] = $value;
+				$this->config[$name] = $value;
 			}
 		}
 		$rightTitle = $this->getConfig("righttitle");
@@ -74,7 +70,7 @@ class SimpleDateField extends TextField {
 				$fileName =   THIRDPARTY_DIR . '/jquery-ui/i18n/' . $fileName;
 				if(file_exists(Director::baseFolder() . "/" . $fileName)) {
 					Requirements::javascript($fileName);
-					self::add_config("locale", $key);
+					$this->addConfig("locale", $key);
 					break;
 				}
 			}
@@ -85,7 +81,7 @@ class SimpleDateField extends TextField {
 		//TO DO:::::: THIS DOES NOT APPEAR TO BE PROPER JSON !
 		
 		$settingsArray = array();
-		$jsConfigArray = self::convert_array_between_string_and_proper_value(self::get_config(), false);
+		$jsConfigArray = self::convert_array_between_string_and_proper_value($this->getConfig(), false);
 		foreach($jsConfigArray as $key => $value) {
 			if(is_string($value)) {
 				$value = "'".Convert::raw2js($value)."'";
@@ -117,13 +113,13 @@ JS;
 				$phpFormat = 'd-m-Y';
 			}
 			$jsSettingsArray[] = " dateFormat: '$jsFormat'";
-			if($maxDate = self::get_config_item('maxDate')) {
+			if($maxDate = $this->getConfig('maxDate')) {
 				$maxDate = strtotime($maxDate);
 				if($maxDate) {
 					$jsSettingsArray[] = " maxDate: '".date($phpFormat, $maxDate)."'";
 				}
 			}
-			if($minDate = self::get_config_item('minDate')) {
+			if($minDate = $this->getConfig('minDate')) {
 				$minDate = strtotime($minDate);
 				if($minDate) {
 					$jsSettingsArray[] = " minDate: '".date($phpFormat, $minDate)."'";
@@ -153,7 +149,7 @@ JS;
 	 */
 	function dataValue() {
 		if($this->value) {
-			$ts = self::convert_to_ts_or_error($this->value);
+			$ts = self::convert_to_ts_or_error($this->value, $this->getConfig());
 			if(is_numeric($ts)) {
 				return date($this->getConfig('datavalueformat'), $ts);
 			}
@@ -170,7 +166,7 @@ JS;
 		if(empty($this->value)) return true;
 		// date format
 		// min/max - Assumes that the date value was valid in the first place
-		$tsOrError = self::convert_to_ts_or_error($this->value);
+		$tsOrError = self::convert_to_ts_or_error($this->value, $this->getConfig());
 		if(is_numeric($tsOrError)) {
 			return true;
 		}
@@ -190,7 +186,7 @@ JS;
 	 * @param mixed $val
 	 */
 	function setConfig($name, $val) {
-		self::$config[$name] = $val;
+		$this->config[$name] = $val;
 	}
 
 	/**
@@ -198,13 +194,17 @@ JS;
 	 * @return mixed
 	 */
 	function getConfig($name) {
-		return self::$config[$name];
+		return $this->config[$name];
 	}
 
-	public static function convert_to_ts_or_error($rawInput) {
+	function addConfig($key, $value) {
+		$this->config[$name] = $value;
+	}
+
+	public static function convert_to_ts_or_error($rawInput, $settings) {
 		//return strtotime("24-06-2012");
 		$tsOrError = null;
-		if(self::get_config_item('monthbeforeday')) {
+		if($settings['monthbeforeday'])) {
 			$cleanedInput = str_replace("-", "/", $rawInput);
 		}
 		else {
@@ -214,20 +214,20 @@ JS;
 			$tsOrError = intval(strtotime($cleanedInput));
 		}
 		if(is_numeric($tsOrError) && $tsOrError > 0) {
-			if($minDate = self::get_config_item('minDate')) {
+			if($minDate = $settings['minDate'])) {
 				$minDate = strtotime($minDate);
 				if($minDate) {
 					if($minDate > $tsOrError) {
-						$tsOrError = sprintf(_t('SimpleDateField.VALIDDATEMINDATE', "Your date can not be before %s."),date(self::get_config_item('dateformat'), $minDate));
+						$tsOrError = sprintf(_t('SimpleDateField.VALIDDATEMINDATE', "Your date can not be before %s."),date($settings['dateformat'], $minDate));
 					}
 				}
 			}
-			if($maxDate = self::get_config_item('maxDate')) {
+			if($maxDate = $settings['maxDate']) {
 				// ISO or strtotime()
 				$maxDate = strtotime($maxDate);
 				if($maxDate) {
 					if($maxDate < $tsOrError) {
-						$tsOrError = sprintf(_t('SimpleDateField.VALIDDATEMAXDATE', "Your date can not be after %s."),date(self::get_config_item('dateformat'), $maxDate));
+						$tsOrError = sprintf(_t('SimpleDateField.VALIDDATEMAXDATE', "Your date can not be after %s."),date($settings['dateformat'], $maxDate));
 					}
 				}
 			}
@@ -243,12 +243,12 @@ JS;
 		return $tsOrError;
 	}
 
-	public static function convert_to_fancy_date($rawInput) {
-		$tsOrError = self::convert_to_ts_or_error($rawInput);
+	public static function convert_to_fancy_date($rawInput, $settings) {
+		$tsOrError = self::convert_to_ts_or_error($rawInput, $settings);
 		if(is_numeric($tsOrError) && $tsOrError) {
 			return Convert::raw2json(
 				array(
-					"value" => date(self::get_config_item("dateformat"), $tsOrError ),
+					"value" => date($settings["dateformat"], $tsOrError ),
 					"success" => 1
 				)
 			);
@@ -309,9 +309,12 @@ class SimpleDateField_Controller extends Controller {
 			$rawInput = ($_GET["value"]);
 		}
 		if(isset($_GET["settings"])) {
-			SimpleDateField::set_config(SimpleDateField::convert_array_between_string_and_proper_value($_GET["settings"], true));
+			$settings = SimpleDateField::convert_array_between_string_and_proper_value($_GET["settings"], true);
+		}
+		else {
+			$settings = array();
 		}		
-		return SimpleDateField::convert_to_fancy_date($rawInput);
+		return SimpleDateField::convert_to_fancy_date($rawInput, $settings);
 	}
 
 
