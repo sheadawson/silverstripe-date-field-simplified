@@ -14,7 +14,7 @@ class SimpleDateField extends TextField {
 	 * @var array
 	 */
 	protected $config = array(
-		'showcalendar' => true,
+		'showcalendar' => false,
 		'monthbeforeday' => false,
 		'righttitle' => "",
 		'dateformat' => "l j F Y", //see PHP Date function
