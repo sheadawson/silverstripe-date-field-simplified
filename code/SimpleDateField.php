@@ -203,8 +203,11 @@ JS;
 
 	public static function convert_to_ts_or_error($rawInput, $settings) {
 		//return strtotime("24-06-2012");
+		if(!isset($settings['dateformat'])) {
+			$settings['dateformat'] = 'l j F Y';
+		}
 		$tsOrError = null;
-		if($settings['monthbeforeday'])) {
+		if(isset($settings['monthbeforeday']) && $settings['monthbeforeday']) {
 			$cleanedInput = str_replace("-", "/", $rawInput);
 		}
 		else {
@@ -214,7 +217,7 @@ JS;
 			$tsOrError = intval(strtotime($cleanedInput));
 		}
 		if(is_numeric($tsOrError) && $tsOrError > 0) {
-			if($minDate = $settings['minDate'])) {
+			if(isset($settings['minDate']) && $minDate = $settings['minDate']) {
 				$minDate = strtotime($minDate);
 				if($minDate) {
 					if($minDate > $tsOrError) {
@@ -222,7 +225,7 @@ JS;
 					}
 				}
 			}
-			if($maxDate = $settings['maxDate']) {
+			if(isset($settings['maxDate']) && $maxDate = $settings['maxDate']) {
 				// ISO or strtotime()
 				$maxDate = strtotime($maxDate);
 				if($maxDate) {
