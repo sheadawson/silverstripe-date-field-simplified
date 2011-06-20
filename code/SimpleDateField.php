@@ -29,7 +29,7 @@ class SimpleDateField extends TextField {
 		static function get_config_item($name) {return self::$config[$name];}
 		
 
-	function __construct($name, $title = null, $value = null, $form = null, $config = array()) {
+	function __construct($name, $title = null, $value = null, $form = null, $rightTitle = '', $config = array()) {
 		parent::__construct($name, $title, $value, $form);
 		if($config && count($config)) {
 			foreach($config as $name => $value) {
