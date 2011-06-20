@@ -320,15 +320,16 @@ class SimpleDateField_Controller extends Controller {
 class SimpleDateField_Editable extends EditableFormField {
 
 	static $db = array(
+		"ShowCalendar" => "Boolean",
 		"OnlyPastDates" => "Boolean",
 		"OnlyFutureDates" => "Boolean",
 		"MonthBeforeDay" => "Boolean",
 		"ExplanationForEnteringDates" => "Varchar(120)"
 	);
 
-	static $singular_name = 'Date Field';
+	static $singular_name = 'Simple ]Date Field';
 
-	static $plural_name = 'Date Fields';
+	static $plural_name = 'Simple Date Fields';
 
 	public function Icon() {
 		return 'userforms/images/editabledatefield.png';
@@ -339,6 +340,7 @@ class SimpleDateField_Editable extends EditableFormField {
 		$fields = parent::getFieldConfiguration();
 		// eventually replace hard-coded "Fields"?
 		$baseName = "Fields[$this->ID]";
+		$ShowCalendar = ($this->getSetting('ShowCalendar')) ? $this->getSetting('ShowCalendar') : '0';
 		$OnlyPastDates = ($this->getSetting('OnlyPastDates')) ? $this->getSetting('OnlyPastDates') : '0';
 		$OnlyFutureDates = ($this->getSetting('OnlyFutureDates')) ? $this->getSetting('OnlyFutureDates') : '0';
 		$MonthBeforeDay = ($this->getSetting('MonthBeforeDay')) ? $this->getSetting('MonthBeforeDay') : '0';
@@ -346,6 +348,7 @@ class SimpleDateField_Editable extends EditableFormField {
 		$extraFields = new FieldSet(
 			new FieldGroup(
 				_t('SimpleDateField_Editable.DATESETTINGS', 'Date Settings'),
+				new CheckboxField($baseName . "[CustomSettings][ShowCalendar]", "Show Calendar", $ShowCalendar),
 				new CheckboxField($baseName . "[CustomSettings][OnlyPastDates]", "Only Past Dates?", $OnlyPastDates),
 				new CheckboxField($baseName . "[CustomSettings][OnlyFutureDates]", "Only Future Dates?", $OnlyFutureDates),
 				new CheckboxField($baseName . "[CustomSettings][MonthBeforeDay]", "Month before day (e.g. Jan 11 2011)?", $MonthBeforeDay),
@@ -359,6 +362,9 @@ class SimpleDateField_Editable extends EditableFormField {
 
 	public function getFormField() {
 		$field = new SimpleDateField($this->Name, $this->Title);
+		if($this->getSetting('ShowCalendar')) {
+			$field->setConfig("showcalendar", true);
+		}
 		if($this->getSetting('OnlyPastDates')) {
 			$field->setConfig("maxDate", "today");
 		}
