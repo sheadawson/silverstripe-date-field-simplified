@@ -193,13 +193,15 @@ JS;
 	 * @param String $name
 	 * @return mixed
 	 */
-	function getConfig($name) {
-		return $this->config[$name];
+	function getConfig($name = '') {
+		if(!$name) {
+			return $this->config;
+		}
+		else {
+			return $this->config[$name];
+		}
 	}
 
-	function addConfig($key, $value) {
-		$this->config[$name] = $value;
-	}
 
 	public static function convert_to_ts_or_error($rawInput, $settings) {
 		//return strtotime("24-06-2012");
